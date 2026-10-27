@@ -1,6 +1,6 @@
 # Temporal Interval Selection for Adversarial Rank Suppression in Text-to-Video Retrieval
 
-This repository contains the code for “Temporal Interval Selection for Adversarial Rank Suppression in Text-to-Video Retrieval,” accepted as a full paper at SOICT 2026.
+This repository contains the code for the paper “Temporal Interval Selection for Adversarial Rank Suppression in Text-to-Video Retrieval,” accepted as a full paper at SOICT 2026.
 
 ## Setup
 
@@ -25,7 +25,3 @@ See [the data format](docs/data-format.md) and [reproduction guide](docs/reprodu
 ## Data
 
 Datasets, model checkpoints, and saved experiment results are not included.
-
-## Citation
-
-P. N. L. Phan and N. H. Luong, “Temporal Interval Selection for Adversarial Rank Suppression in Text-to-Video Retrieval,” SOICT 2026.
