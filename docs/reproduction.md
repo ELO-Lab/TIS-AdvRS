@@ -34,3 +34,7 @@ The attack API accepts tensors in `(T, C, H, W)` order with RGB values in `[0, 1
 For PSNR, sequence MSE is pooled over every pixel in the video. For SSIM, per-frame SSIM is averaged uniformly across the sequence. Untouched frames contribute zero MSE and SSIM equal to one. The algebraic recovery is valid under these definitions; it is not valid for crop-only metrics or cohort-averaged metrics.
 
 The result reconstruction command does not rerun attacks or alter saved authorities. Numerical reproduction also depends on matching the data, annotations, model checkpoint, preprocessing, and runtime used for the experiment.
+
+## Implementation scope
+
+The temporal regularizer in this package uses full-video denominators as written in Equation (4). A preserved experiment runtime computes temporal means over the affected crop. The two implementations are not numerically interchangeable; keep each reported result tied to its runtime and per-query authority.
