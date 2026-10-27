@@ -1,6 +1,6 @@
 # Temporal Interval Selection for Adversarial Rank Suppression in Text-to-Video Retrieval
 
-Code for the paper's temporal interval selectors and adversarial attack for text-to-video retrieval.
+This repository contains the code for “Temporal Interval Selection for Adversarial Rank Suppression in Text-to-Video Retrieval,” accepted as a full paper at SOICT 2026.
 
 ## Setup
 
