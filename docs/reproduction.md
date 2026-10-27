@@ -37,4 +37,4 @@ The result reconstruction command does not rerun attacks or alter saved authorit
 
 ## Implementation scope
 
-The temporal regularizer in this package uses full-video denominators as written in Equation (4). A preserved experiment runtime computes temporal means over the affected crop. The two implementations are not numerically interchangeable; keep each reported result tied to its runtime and per-query authority.
+This package normalizes temporal losses over the full video. A preserved experiment runtime computes the means over the crop containing the affected retrieval windows, so results from the two implementations are not numerically interchangeable. Match each result to its runtime and per-query authority.
