@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "temporal-interval-selection"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["torch>=2.1"]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.6"]
+
+[project.scripts]
+tis-fidelity = "temporal_interval_selection.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["temporal_interval_selection*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

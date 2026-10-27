@@ -1,0 +1,20 @@
+{
+  "retrieval": {
+    "window_size": 16,
+    "stride": 1
+  },
+  "edit": {
+    "interval_length": 16,
+    "epsilon": 0.03137254901960784,
+    "steps": 15,
+    "initial_step_size": 0.00784313725490196,
+    "final_step_size_ratio": 0.1
+  },
+  "objective": {
+    "smoothness_weight": 0.5,
+    "acceleration_weight": 0.0
+  },
+  "gradient_lse": {
+    "temperature": 0.01
+  }
+}
