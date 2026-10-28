@@ -113,6 +113,14 @@ def analyze_intervals(
     if any(not math.isfinite(float(score)) for score in scores):
         raise ValueError("window scores must be finite")
     normalized_windows = tuple(tuple(window) for window in windows)
+    expected_windows = tuple(
+        tuple(range(start, start + window_size))
+        for start in range(frame_count - window_size + 1)
+    )
+    if normalized_windows != expected_windows:
+        raise ValueError(
+            "windows must contain every stride-1 interval exactly once, in start order"
+        )
     for window in normalized_windows:
         if len(window) != window_size:
             raise ValueError("every scored window must match window_size")

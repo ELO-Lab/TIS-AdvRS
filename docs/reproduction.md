@@ -1,40 +1,80 @@
 # Reproduction guide
 
-## Evaluation cohorts
+## What this repository can verify
 
-The paper reports results for two distinct query cohorts:
+After installation, run:
 
-- The competition cohort contains 48 queries and is reported descriptively for the three primary interval selectors.
-- The primary cohort contains 100 queries. It includes the additional Gradient-LSE comparison and the edited-frame fidelity table.
+```bash
+python -m unittest discover -s tests -v
+```
 
-Keep cohort annotations and saved per-query authorities separate. The same selector names or query count do not establish that two authority files refer to the same cohort.
+These CPU smoke tests validate the paper-aligned formulas and invariants with a toy
+adapter:
 
-## Required inputs
+- full-sequence first- and second-order temporal normalization;
+- zero initialization, PGD bounds, and selected-frame isolation;
+- per-query PSNR/SSIM reconstruction before cohort averaging; and
+- the frozen attack defaults in `configs/paper.json`.
 
-To run an attack, provide:
+They do not run the SigLIP model or verify any paper table.
 
-1. The authorized query catalog and target video/frame mappings for the selected cohort.
-2. The original video keyframes and frame-index mapping.
-3. The pinned text-to-video model and preprocessing.
-4. The complete corpus embeddings or an equivalent validated retrieval index.
-5. A `RunnerHooks` implementation for sliding-window construction, affected-window lookup, and SSIM.
+## Paper cohorts
 
-The attack API accepts tensors in `(T, C, H, W)` order with RGB values in `[0, 1]`. Keep the input video on CPU; the attack moves only the selected frames and one retrieval window at a time to the configured CUDA device. The video encoder adapter must return the normalized video embedding used by the retrieval model. The query embedding and retrieval settings must match the run protocol.
+The current paper reports two separate cohorts:
+
+- an earlier 48-query competition cohort, used for descriptive context; and
+- a prospectively locked 93-query cohort on 93 target videos.
+
+The paper compares three selectors: target-centered, highest-score-window, and
+minimum-unaffected-floor. The `gradient_lse.py` module is an earlier experimental
+utility and is not part of the reported three-selector results. Keep authorities from
+the two cohorts separate.
+
+## Required inputs for a full rerun
+
+A numerical rerun requires all of the following external, versioned inputs:
+
+1. locked query text and target-video/frame mappings for one cohort;
+2. the original sampled keyframes and frame-index mapping;
+3. the pinned SigLIP model checkpoint and exact preprocessing;
+4. clean embeddings/scores for every stride-one window in the corpus;
+5. a full-corpus reranking implementation; and
+6. per-query authority storage for interval choices, ranks, and fidelity metrics.
+
+The package accepts video tensors in `(T, C, H, W)` order with RGB values in `[0, 1]`.
+The caller supplies the model adapter and `RunnerHooks` for sliding windows, affected
+window lookup, and SSIM. CUDA is recommended for a real run; CPU is suitable only for
+small functional checks.
 
 ## Run sequence
 
-1. Compute clean retrieval scores for every temporal window and map the annotated target keyframe to a zero-based index.
-2. Call `target_centered_positions` and `analyze_intervals` to obtain the three primary intervals from the same clean scores and fixed interval length.
-3. Run `run_scheduled_pgd` with the selected positions and the shared attack settings.
-4. Save one successful authority row per query and method, including full-sequence PSNR/SSIM and the selected frame positions.
-5. Rebuild edited-frame fidelity with `tis-fidelity`. The command validates matching query sets, converts each query independently, and only then averages.
+1. Compute clean scores for every stride-one window and map the reviewed target frame to
+   a zero-based keyframe index.
+2. Call `target_centered_positions` and `analyze_intervals` using the complete ordered
+   window list. The selector rejects incomplete or non-stride-one lists.
+3. Run `run_scheduled_pgd` for each selected interval with the same `PGDConfig`.
+4. Re-encode every target window and rank the target against the complete 873-video
+   corpus. The package does not implement this corpus-level stage.
+5. Save one successful authority row per query and method.
+6. Rebuild edited-frame fidelity with `tis-fidelity`; it validates matching query sets,
+   recovers each query independently, and only then averages.
 
 ## Fidelity assumptions
 
-For PSNR, sequence MSE is pooled over every pixel in the video. For SSIM, per-frame SSIM is averaged uniformly across the sequence. Untouched frames contribute zero MSE and SSIM equal to one. The algebraic recovery is valid under these definitions; it is not valid for crop-only metrics or cohort-averaged metrics.
+The reconstruction command expects pooled full-sequence MSE-derived PSNR and uniformly
+frame-averaged SSIM. Untouched frames are assumed unchanged. The algebra is valid only
+under those definitions; it is not valid for crop-only metrics or cohort-averaged
+metrics.
 
-The result reconstruction command does not rerun attacks or alter saved authorities. Numerical reproduction also depends on matching the data, annotations, model checkpoint, preprocessing, and runtime used for the experiment.
+## Runtime and provenance boundary
 
-## Implementation scope
+The package follows the current paper protocol: full-video temporal normalization,
+full-sequence fidelity, zero-start PGD, and a step size decaying to 10% of 2/255. A
+historical runtime snapshot used during research instead computed temporal/image
+statistics on an affected crop and used a constant step size. It is not established as
+the exact source of every reported result. Do not combine its authorities with this
+package's outputs.
 
-This package normalizes temporal losses over the full video. A preserved experiment runtime computes the means over the crop containing the affected retrieval windows, so results from the two implementations are not numerically interchangeable. Match each result to its runtime and per-query authority.
+The repository does not include the dataset, model weights, corpus cache, locked
+annotations, or per-query execution authorities. Consequently, matching the reported
+ranks and aggregate tables requires access to those artifacts in addition to this code.
