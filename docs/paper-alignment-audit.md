@@ -1,9 +1,9 @@
 # Paper alignment audit
 
-This audit compares the source package with the current manuscript protocol. The paper
+This audit compares the source package with the attached camera-ready manuscript. The paper
 source/PDF is not included in this repository, so the paper-side details were checked
 against the manuscript artifact available in the surrounding research workspace. This
-is a static/code audit; it is not a fresh 48- or 93-query experiment.
+is a static/code audit; it is not a fresh 48- or 100-query experiment.
 
 ## Alignment matrix
 
@@ -14,6 +14,7 @@ is a static/code audit; it is not a fresh 48- or 93-query experiment.
 | Target-centered interval: seven before, eight after when possible | `target_centered_positions` | Implemented |
 | Highest-score-window baseline with earliest tie | `analyze_intervals` | Implemented |
 | Minimum unaffected-floor selector over every valid start | `analyze_intervals` | Implemented |
+| Gradient-LSE selector, τ = 0.01 | `gradient_lse.py` | Implemented |
 | Zero-start PGD | `run_scheduled_pgd` | Implemented |
 | ε = 8/255, first step = 2/255, 15 updates | `PGDConfig` | Implemented |
 | Linear decay to 10% of initial step | `run_scheduled_pgd` | Implemented |
@@ -22,12 +23,12 @@ is a static/code audit; it is not a fresh 48- or 93-query experiment.
 | Full-sequence PSNR/SSIM reconstruction | `fidelity.py`, `results.py` | Implemented under documented metric assumptions |
 | Full-corpus target reranking | Caller responsibility | Not implemented in this package |
 | SigLIP model, preprocessing, 873-video corpus | External artifacts | Not included |
-| Reported 48/93-query authorities and aggregate tables | External artifacts | Not included |
-| Gradient-LSE | Earlier utility | Not part of the current paper's three-selector result |
+| Reported 48/100-query authorities and aggregate tables | External artifacts | Not included |
+| SigLIP query construction and 873-video full-corpus reranking | Caller/runtime | Not implemented in this package |
 
 ## Reproduction conclusion
 
-The algorithmic core is consistent with the paper protocol. The repository can therefore
+The algorithmic core is consistent with the camera-ready protocol. The repository can therefore
 reproduce selector decisions and run a small attack when a compatible adapter is supplied.
 It cannot, from the checked-in files alone, reproduce the paper's final ranks or aggregate
 numbers because the data, checkpoint, corpus cache, locked annotations, and authorities

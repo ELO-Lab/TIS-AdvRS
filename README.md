@@ -7,7 +7,7 @@ reconstruction.
 
 ## What is implemented
 
-The three selectors use one fixed budget of 16 consecutive keyframes and stride-one
+The four selectors use one fixed budget of 16 consecutive keyframes and stride-one
 retrieval windows:
 
 | Selector | Rule |
@@ -15,6 +15,7 @@ retrieval windows:
 | `target_centered` | Center the interval on the reviewed target frame. |
 | `highest_score_window` | Use the clean window with the highest query score. |
 | `minimum_unaffected_floor` | Choose the interval minimizing the highest clean score among windows it cannot affect. |
+| `gradient_lse` | Use the contiguous interval with the largest temperature-smoothed gradient saliency. |
 
 The selector has no fitted weights or thresholds. Ties use the earliest valid start.
 The attack core follows the paper's shared optimizer: zero initialization, 15 PGD
@@ -23,28 +24,31 @@ that value, and first-order temporal smoothness with weight 0.5. Temporal losses
 sequence-level fidelity are normalized over the complete video, including unchanged
 frames outside the selected interval.
 
-`gradient_lse.py` is retained as an experimental utility from an earlier protocol. It
-is not one of the three selectors reported in the current paper.
+`gradient_lse.py` implements the additional Gradient-LSE comparison reported on the
+100-query primary cohort. It uses temperature τ=0.01 and gradients with respect to
+cached normalized keyframe embeddings.
 
 ## Repository structure
 
 ```text
-configs/
-  paper.json                         Frozen window, budget, PGD, and utility settings
-docs/
-  data-format.md                     JSONL authority formats and metric assumptions
-  reproduction.md                    Cohorts, required assets, and run order
-scripts/
-  rebuild_fidelity_report.py         CLI wrapper for per-query PSNR/SSIM recovery
-src/temporal_interval_selection/
-  selectors.py                       Three deterministic interval selectors
-  scheduled_attack.py                Memory-bounded PGD and run metrics
-  temporal.py                        Full-sequence first/second-order penalties
-  fidelity.py                        Sequence-to-edited-frame metric conversion
-  results.py                          Authority validation and aggregation
-  gradient_lse.py                    Experimental earlier selector
-tests/
-  test_cpu_smoke.py                  Dependency-light semantic smoke tests
+├── configs/
+│   └── paper.json                    Frozen window, budget, PGD, and utility settings
+├── docs/
+│   ├── data-format.md                JSONL authority formats and metric assumptions
+│   ├── paper-alignment-audit.md      Paper-to-code alignment review
+│   └── reproduction.md               Cohorts, required assets, and run order
+├── scripts/
+│   └── rebuild_fidelity_report.py    CLI wrapper for per-query PSNR/SSIM recovery
+├── src/
+│   └── temporal_interval_selection/
+│       ├── selectors.py              Three deterministic interval selectors
+│       ├── scheduled_attack.py       Memory-bounded PGD and run metrics
+│       ├── temporal.py               Full-sequence first/second-order penalties
+│       ├── fidelity.py               Sequence-to-edited-frame metric conversion
+│       ├── results.py                Authority validation and aggregation
+│       └── gradient_lse.py            Gradient-LSE primary-cohort selector
+└── tests/
+    └── test_cpu_smoke.py             Dependency-light semantic smoke tests
 ```
 
 ## Reproducibility status
@@ -54,8 +58,8 @@ not a self-contained rerun of the reported experiment. The private/external inpu
 not included:
 
 - the 873-video collection and sampled keyframes;
-- locked query, target-video, and target-frame annotations for the 48-query earlier
-  cohort and the 93-query prospective cohort;
+- locked query, target-video, and target-frame annotations for the 48-query competition
+  cohort and the 100-query primary cohort;
 - the pinned SigLIP checkpoint, preprocessing runtime, and complete corpus cache; and
 - the per-query execution authorities used to produce the paper tables.
 

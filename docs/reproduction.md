@@ -20,15 +20,14 @@ They do not run the SigLIP model or verify any paper table.
 
 ## Paper cohorts
 
-The current paper reports two separate cohorts:
+The camera-ready paper reports two separate cohorts:
 
 - an earlier 48-query competition cohort, used for descriptive context; and
-- a prospectively locked 93-query cohort on 93 target videos.
+- a 100-query primary cohort on 100 distinct target videos.
 
-The paper compares three selectors: target-centered, highest-score-window, and
-minimum-unaffected-floor. The `gradient_lse.py` module is an earlier experimental
-utility and is not part of the reported three-selector results. Keep authorities from
-the two cohorts separate.
+The paper compares target-centered, highest-score-window, and minimum-unaffected-floor
+on both cohorts. It also evaluates Gradient-LSE on the 100-query primary cohort. Keep
+authorities from the two cohorts and four strategies separate.
 
 ## Required inputs for a full rerun
 
@@ -68,7 +67,7 @@ metrics.
 
 ## Runtime and provenance boundary
 
-The package follows the current paper protocol: full-video temporal normalization,
+The package follows the camera-ready protocol: full-video temporal normalization,
 full-sequence fidelity, zero-start PGD, and a step size decaying to 10% of 2/255. A
 historical runtime snapshot used during research instead computed temporal/image
 statistics on an affected crop and used a constant step size. It is not established as
