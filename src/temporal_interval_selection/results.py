@@ -25,7 +25,7 @@ def _read_jsonl(path: Path) -> list[dict[str, Any]]:
             except json.JSONDecodeError as error:
                 raise ValueError(f"invalid JSON at {path}:{line_number}") from error
             if not isinstance(row, dict):
-                raise ValueError(f"expected a JSON object at {path}:{line_number}")
+                raise TypeError(f"expected a JSON object at {path}:{line_number}")
             rows.append(row)
     return rows
 
@@ -48,7 +48,7 @@ def _frame_counts(interval_authority: Path, *, edited_frames: int) -> dict[str, 
     for query_id, row in rows.items():
         analysis = row.get("analysis")
         if not isinstance(analysis, dict):
-            raise ValueError(f"missing interval analysis for {query_id}")
+            raise TypeError(f"missing interval analysis for {query_id}")
         intervals = analysis.get("intervals_evaluated")
         if isinstance(intervals, bool) or not isinstance(intervals, int) or intervals < 1:
             raise ValueError(f"invalid intervals_evaluated for {query_id}")
@@ -64,7 +64,7 @@ def _sequence_metrics(
         raise ValueError(f"{method}/{query_id} is not a successful authority row")
     measurements = row.get("measurements")
     if not isinstance(measurements, dict):
-        raise ValueError(f"{method}/{query_id} has no measurements object")
+        raise TypeError(f"{method}/{query_id} has no measurements object")
     if measurements.get("changed_frame_count") != edited_frames:
         raise ValueError(f"{method}/{query_id} did not edit exactly {edited_frames} frames")
     if measurements.get("uses_mock") is True:
@@ -73,16 +73,10 @@ def _sequence_metrics(
     psnr = measurements.get("psnr")
     ssim = measurements.get("ssim")
     if psnr is not None and (
-        isinstance(psnr, bool)
-        or not isinstance(psnr, (int, float))
-        or not math.isfinite(psnr)
+        isinstance(psnr, bool) or not isinstance(psnr, (int, float)) or not math.isfinite(psnr)
     ):
         raise ValueError(f"invalid sequence PSNR for {method}/{query_id}")
-    if (
-        isinstance(ssim, bool)
-        or not isinstance(ssim, (int, float))
-        or not math.isfinite(ssim)
-    ):
+    if isinstance(ssim, bool) or not isinstance(ssim, (int, float)) or not math.isfinite(ssim):
         raise ValueError(f"invalid sequence SSIM for {method}/{query_id}")
     return psnr, float(ssim)
 
@@ -146,9 +140,7 @@ def rebuild_fidelity_report(
             )
 
         finite_psnr = [
-            row["edited_psnr_db"]
-            for row in per_query
-            if row["edited_psnr_db"] is not None
+            row["edited_psnr_db"] for row in per_query if row["edited_psnr_db"] is not None
         ]
         report["methods"][method] = {
             "mean_edited_psnr_db_finite_only": (

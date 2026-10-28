@@ -7,7 +7,6 @@ from dataclasses import dataclass
 
 import torch
 
-
 WindowScorer = Callable[[torch.Tensor, Sequence[int]], torch.Tensor]
 
 
@@ -74,9 +73,7 @@ def select_gradient_lse_interval(
     if not bool(torch.isfinite(score_tensor).all()):
         raise ValueError("window scores must be finite")
 
-    smooth_score = float(temperature) * torch.logsumexp(
-        score_tensor / float(temperature), dim=0
-    )
+    smooth_score = float(temperature) * torch.logsumexp(score_tensor / float(temperature), dim=0)
     gradient = torch.autograd.grad(smooth_score, embeddings)[0]
     saliency = gradient.abs().sum(dim=-1)
     candidates = torch.stack(

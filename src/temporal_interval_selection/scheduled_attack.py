@@ -20,7 +20,7 @@ class VideoAdapter(Protocol):
 class PGDConfig:
     """Paper settings for scheduled PGD on one selected interval."""
 
-    device: str = "cuda"
+    device: str = "cuda" if torch.cuda.is_available() else "cpu"
     epsilon: float = 8.0 / 255.0
     alpha: float = 2.0 / 255.0
     steps: int = 15
@@ -108,13 +108,12 @@ def run_scheduled_pgd(
 ) -> tuple[torch.Tensor, dict[str, Any]]:
     """Run the fixed-step PGD procedure used for a locked edit interval.
 
-    Only the edited frames are retained as trainable CUDA state. Temporal
-    regularizers and reported fidelity metrics are normalized over the full
-    input sequence, including zero-perturbation frames outside the interval.
+    Only the edited frames are retained as trainable state on the configured
+    device. Temporal regularizers and reported fidelity metrics are normalized
+    over the full input sequence, including zero-perturbation frames outside
+    the interval. Small CPU runs are supported for functional checks.
     """
     device = torch.device(config.device)
-    if device.type != "cuda":
-        raise ValueError("scheduled PGD requires CUDA")
     if video_frames.ndim != 4 or not video_frames.is_floating_point():
         raise ValueError("video_frames must be a floating tensor shaped (T, C, H, W)")
     if query_embedding.ndim != 1:
