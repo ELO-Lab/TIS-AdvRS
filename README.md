@@ -137,8 +137,3 @@ tis-fidelity \
 ```
 
 This command only validates and aggregates saved authorities; it does not rerun attacks.
-
-## Citation
-
-P. N. L. Phan and N. H. Luong, “Interval Selection for Adversarial Rank Suppression in
-Windowed Text-to-Video Retrieval,” SOICT 2026.
