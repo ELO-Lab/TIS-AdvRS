@@ -21,8 +21,10 @@ is a static/code audit; it is not a fresh 48- or 100-query experiment.
 | First-order smoothness, λ₁ = 0.5 | `temporal.py`, `scheduled_attack.py` | Implemented |
 | Temporal normalization over all T frames | `temporal_regularizers` | Implemented and smoke-tested |
 | Full-sequence PSNR/SSIM reconstruction | `fidelity.py`, `results.py` | Implemented under documented metric assumptions |
+| Query encoding/splitting and short-video padding | Caller/runtime | Not implemented in this package |
 | Full-corpus target reranking | Caller responsibility | Not implemented in this package |
 | SigLIP model, preprocessing, 873-video corpus | External artifacts | Not included |
+| Bootstrap/sign-test evaluation pipeline | Caller/runtime | Not implemented in this package |
 | Reported 48/100-query authorities and aggregate tables | External artifacts | Not included |
 | SigLIP query construction and 873-video full-corpus reranking | Caller/runtime | Not implemented in this package |
 

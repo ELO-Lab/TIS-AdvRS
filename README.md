@@ -68,8 +68,9 @@ Inputs are `(T, C, H, W)` RGB tensors in `[0, 1]`. The caller provides the model
 ## Reproduction
 
 The package contains the algorithmic core and fidelity reconstruction. Reproducing the
-paper tables also requires the locked queries and targets, 873-video corpus and cache,
-exact SigLIP runtime/checkpoint, full-corpus reranking, and per-query authorities.
+paper tables also requires the locked queries and targets, query encoding and splitting,
+short-video padding, the 873-video corpus and cache, the exact SigLIP runtime/checkpoint,
+full-corpus reranking, the statistical evaluation pipeline, and per-query authorities.
 
 Those artifacts are external to this repository. See [docs/reproduction.md](docs/reproduction.md)
 for the expected run order and input formats.
